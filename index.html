@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crestview's Digital Quartermaster</title>
+
+<style>
+    *{
+        box-sizing:border-box;
+    }
+
+    body{
+        margin:0;
+        font-family:Arial, sans-serif;
+        background:#111827;
+        color:white;
+    }
+
+    header{
+        background:#0f172a;
+        padding:20px;
+        text-align:center;
+        font-size:2rem;
+        font-weight:bold;
+        border-bottom:3px solid gold;
+    }
+
+    .container{
+        max-width:1100px;
+        margin:auto;
+        padding:20px;
+    }
+
+    .box{
+        background:#1f2937;
+        padding:20px;
+        border-radius:12px;
+        margin-bottom:20px;
+        box-shadow:0 0 10px rgba(0,0,0,0.3);
+    }
+
+    input, button{
+        width:100%;
+        padding:12px;
+        margin-top:10px;
+        border:none;
+        border-radius:8px;
+        font-size:1rem;
+    }
+
+    input{
+        background:white;
+        color:black;
+    }
+
+    button{
+        background:gold;
+        color:black;
+        font-weight:bold;
+        cursor:pointer;
+    }
+
+    button:hover{
+        opacity:0.9;
+    }
+
+    #mainContent{
+        display:none;
+    }
+
+    .uniform-card{
+        background:#374151;
+        border-radius:12px;
+        padding:15px;
+        margin-top:15px;
+    }
+
+    .card-row{
+        display:flex;
+        gap:15px;
+        margin-top:10px;
+    }
+
+    .mini-box{
+        flex:1;
+        background:#4b5563;
+        padding:10px;
+        border-radius:8px;
+    }
+
+    .search-bar{
+        margin-bottom:20px;
+    }
+
+    .delete-btn{
+        background:#ef4444;
+        margin-top:15px;
+    }
+
+    .delete-btn:hover{
+        background:#dc2626;
+    }
+
+    .error{
+        color:#ff6b6b;
+        margin-top:10px;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    Crestview's Digital Quartermaster
+</header>
+
+<div class="container">
+
+    <!-- LOGIN -->
+    <div class="box" id="loginBox">
+
+        <h2>Quartermaster Login</h2>
+
+        <input type="password"
+               id="passwordInput"
+               placeholder="Enter Password">
+
+        <button onclick="login()">Login</button>
+
+        <p class="error" id="errorMessage"></p>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="mainContent">
+
+        <!-- ADD UNIFORM -->
+        <div class="box">
+
+            <h2>Add Uniform</h2>
+
+            <input type="text"
+                   id="uniformName"
+                   placeholder="Student Name">
+
+            <input type="text"
+                   id="uniformNumber"
+                   placeholder="Uniform Number">
+
+            <div class="card-row">
+
+                <div class="mini-box">
+
+                    <label>Jacket Number</label>
+
+                    <input type="text"
+                           id="jacketNumber">
+
+                </div>
+
+                <div class="mini-box">
+
+                    <label>Bibber Number</label>
+
+                    <input type="text"
+                           id="bibberNumber">
+
+                </div>
+
+            </div>
+
+            <button onclick="addUniform()">
+                Add Uniform
+            </button>
+
+        </div>
+
+        <!-- SEARCH -->
+        <div class="box">
+
+            <h2>Search Uniforms</h2>
+
+            <input type="text"
+                   id="searchInput"
+                   class="search-bar"
+                   placeholder="Search by name, uniform #, jacket #, or bibber #"
+                   onkeyup="searchUniforms()">
+
+            <div id="uniformContainer"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    // PASSWORD
+    const websitePassword = "crestviewqm";
+
+    // STORED UNIFORMS
+    let uniforms = [];
+
+    // LOGIN
+    function login(){
+
+        const enteredPassword =
+            document.getElementById("passwordInput").value;
+
+        if(enteredPassword === websitePassword){
+
+            document.getElementById("loginBox").style.display = "none";
+
+            document.getElementById("mainContent").style.display = "block";
+
+        } else {
+
+            document.getElementById("errorMessage")
+                .innerText = "Incorrect Password";
+
+        }
+
+    }
+
+    // ADD UNIFORM
+    function addUniform(){
+
+        const name =
+            document.getElementById("uniformName").value;
+
+        const uniformNumber =
+            document.getElementById("uniformNumber").value;
+
+        const jacketNumber =
+            document.getElementById("jacketNumber").value;
+
+        const bibberNumber =
+            document.getElementById("bibberNumber").value;
+
+        if(name === "" || uniformNumber === ""){
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        const uniform = {
+            id: Date.now(),
+            name,
+            uniformNumber,
+            jacketNumber,
+            bibberNumber
+        };
+
+        uniforms.push(uniform);
+
+        renderUniforms(uniforms);
+
+        // CLEAR INPUTS
+        document.getElementById("uniformName").value = "";
+        document.getElementById("uniformNumber").value = "";
+        document.getElementById("jacketNumber").value = "";
+        document.getElementById("bibberNumber").value = "";
+
+    }
+
+    // RENDER UNIFORMS
+    function renderUniforms(data){
+
+        const container =
+            document.getElementById("uniformContainer");
+
+        container.innerHTML = "";
+
+        if(data.length === 0){
+
+            container.innerHTML =
+                "<p>No uniforms found.</p>";
+
+            return;
+
+        }
+
+        data.forEach(uniform => {
+
+            const card =
+                document.createElement("div");
+
+            card.classList.add("uniform-card");
+
+            card.innerHTML = `
+
+                <h3>${uniform.name}</h3>
+
+                <p>
+                    <strong>Uniform Number:</strong>
+                    ${uniform.uniformNumber}
+                </p>
+
+                <div class="card-row">
+
+                    <div class="mini-box">
+
+                        <strong>Jacket Number</strong>
+
+                        <p>${uniform.jacketNumber}</p>
+
+                    </div>
+
+                    <div class="mini-box">
+
+                        <strong>Bibber Number</strong>
+
+                        <p>${uniform.bibberNumber}</p>
+
+                    </div>
+
+                </div>
+
+                <button class="delete-btn"
+                        onclick="deleteUniform(${uniform.id})">
+
+                    Delete Uniform
+
+                </button>
+
+            `;
+
+            container.appendChild(card);
+
+        });
+
+    }
+
+    // SEARCH
+    function searchUniforms(){
+
+        const searchValue =
+            document.getElementById("searchInput")
+            .value
+            .toLowerCase();
+
+        const filteredUniforms = uniforms.filter(uniform =>
+
+            uniform.name.toLowerCase().includes(searchValue)
+
+            ||
+
+            uniform.uniformNumber.toLowerCase().includes(searchValue)
+
+            ||
+
+            uniform.jacketNumber.toLowerCase().includes(searchValue)
+
+            ||
+
+            uniform.bibberNumber.toLowerCase().includes(searchValue)
+
+        );
+
+        renderUniforms(filteredUniforms);
+
+    }
+
+    // DELETE
+    function deleteUniform(id){
+
+        uniforms = uniforms.filter(
+            uniform => uniform.id !== id
+        );
+
+        renderUniforms(uniforms);
+
+    }
+
+</script>
+
+</body>
+</html>
